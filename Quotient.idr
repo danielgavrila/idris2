@@ -5,6 +5,7 @@ import Data.Nat.Division
 import Data.Nat.Equational
 import Data.Nat.Order
 import Data.Fin
+import Data.Fin.Extra
 import Data.Nat.Order.Properties
 %default total
 N,M,D:Nat
@@ -17,11 +18,16 @@ D=3
 
 
 -- use elemSmallerThanBound
-res1,res2:LT 1 3
+res1:LT 1 3
 res1 = boundModNatNZ 13 3  SIsNonZero
 
-pr1: 1 `lt` 3 = true
-res2 = ltIsLT 1 3 pr1
+res2:LTE 3 5
+pr1: 3 `lte` 5 = True
+pr1 = Refl
+res2 = lteIsLTE 3 5 pr1
+
+res3: LT 2 5
+res3 = res2
 
 DivisionTheorem' : (numer, denom : Nat) -> (0 prf1 : NonZero denom)
                -> numer =  (modNatNZ numer denom prf1) +  (divNatNZ numer denom prf1)*denom 
@@ -76,8 +82,40 @@ quotMultDenom numer denom prf = let divTheorem : ( numer  = (modNatNZ numer deno
                                     divTheorem = DivisionTheorem' numer denom prf 
                                 in
                                 sumOrderRight numer   (modNatNZ numer denom prf)  ((divNatNZ numer denom prf)*denom)  divTheorem 
+{-
+
+-}
+
+LTEIsTransitive' : (m : Nat) -> (n : Nat) -> (o : Nat) ->
+                           LTE m n -> LTE (S n) o ->
+                           LT  m  o -- this last type is equal with LTE (S m)  o
+LTEIsTransitive' m  n o                 mlten             nlteo        = let msucc_lte_nsucc : LTE (S m) (S n) 
+                                                                             msucc_lte_nsucc = shift m n mlten
+                                                                         in
+                                                                         LTEIsTransitive (S m) (S n) o  msucc_lte_nsucc nlteo 
+
+doubleBound :{bound :Nat } -> (numFin : Fin bound) -> Nat
+doubleBound  numFin = let b1 = bound
+                      in
+                      plus b1 b1 
+f1: Fin 7
+f1 = 3
+
+quotMultDenomSmaller : {bound :Nat } -> (numFin : Fin bound) -> (denom : Nat) -> (0 prf : NonZero denom) -> (divNatNZ (finToNat numFin) denom prf)*denom `LT`  bound 
+quotMultDenomSmaller numFin denom prf = let numer : Nat
+                                            numer = finToNat numFin
+                                            mult1 : Nat
+                                            mult1 =  (divNatNZ numer denom prf)*denom
+                                            res: mult1 `LTE`  numer
+                                            res = quotMultDenom numer denom prf
+                                            smallerBound : LT numer bound
+                                            smallerBound = elemSmallerThanBound numFin
+                                        in
+                                        LTEIsTransitive' mult1 numer bound res smallerBound
+
+
 
 -- quotMultDenom  13 4 SIsNonZero
 
-                                
+-- LTEIsTransitive : (m : Nat) -> (n : Nat) -> (o : Nat) -> LTE m n -> LTE n o -> LTE m o
 
