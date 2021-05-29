@@ -82,9 +82,6 @@ quotMultDenom numer denom prf = let divTheorem : ( numer  = (modNatNZ numer deno
                                     divTheorem = DivisionTheorem' numer denom prf 
                                 in
                                 sumOrderRight numer   (modNatNZ numer denom prf)  ((divNatNZ numer denom prf)*denom)  divTheorem 
-{-
-
--}
 
 LTEIsTransitive' : (m : Nat) -> (n : Nat) -> (o : Nat) ->
                            LTE m n -> LTE (S n) o ->
@@ -94,12 +91,6 @@ LTEIsTransitive' m  n o                 mlten             nlteo        = let msu
                                                                          in
                                                                          LTEIsTransitive (S m) (S n) o  msucc_lte_nsucc nlteo 
 
-doubleBound :{bound :Nat } -> (numFin : Fin bound) -> Nat
-doubleBound  numFin = let b1 = bound
-                      in
-                      plus b1 b1 
-f1: Fin 7
-f1 = 3
 
 quotMultDenomSmaller : {bound :Nat } -> (numFin : Fin bound) -> (denom : Nat) -> (0 prf : NonZero denom) -> (divNatNZ (finToNat numFin) denom prf)*denom `LT`  bound 
 quotMultDenomSmaller numFin denom prf = let numer : Nat
@@ -112,8 +103,45 @@ quotMultDenomSmaller numFin denom prf = let numer : Nat
                                             smallerBound = elemSmallerThanBound numFin
                                         in
                                         LTEIsTransitive' mult1 numer bound res smallerBound
+--nbz : NotBothZero 1 4
+--nbz  = LeftIsNotZero 
+
+oneZero : (a : Nat) -> a = 0 -> True = isZero a
+oneZero Z prf  = Refl 
+oneZero (S k) _ impossible
 
 
+zeroPlusLeftZero : (a,b : Nat) -> (0 = a + b) -> a = 0
+zeroPlusLeftZero 0 0 Refl = Refl
+zeroPlusLeftZero (S k) b _ impossible
+
+
+
+
+--zeroMultEitherZero : (a,b : Nat) -> a*b = 0 -> Either (a = 0) (b = 0)
+zeroMultEitherZero' : (a,b : Nat) -> a*b = 0 -> Either (0 = a) (b = 0)
+zeroMultEitherZero' 0 b prf = Left Refl
+zeroMultEitherZero' (S a) b prf = Right $ zeroPlusLeftZero b (a * b) (sym prf)
+
+
+
+zeroPlusLeftZero' : (a,b : Nat) -> ( a + b = 0) -> True = isZero a
+zeroPlusLeftZero' 0 0 Refl = Refl
+zeroPlusLeftZero' (S k) b _ impossible
+
+eitherZero :(a,b : Nat) -> a*b = 0 -> True = isZero a ||  isZero b           
+eitherZero  0     b   p1 = Refl 
+eitherZero  (S a) b   p2 = ?prf1    --zeroPlusLeftZero' b  (a*b)
+                 
+--    multZeroLeftZero : (right : Nat) -> Z * right = Z                 
+--    multZeroRightZero : (left : Nat) -> left * Z = Z
+multWithZero: (a:Nat) ->  LTE 1 (mult a 0) -> Void    -- (mult a 0 )
+multWithZero a _  impossible  
+
+bothNonZero :(a,b : Nat) -> LT 0 (a*b)  ->  False = isZero a ||  isZero b          -- ((False = isZero a ) && (False =  isZero b)) = True           
+bothNonZero  0     b     p1 impossible  
+bothNonZero  (S a) (S b) p2 = Refl --?prf3    --zeroPlusLeftZero' b  (a*b)
+bothNonZero   a      0     p1  =  ?prf2 --impossible  (multZeroRightZero a ) --
 
 -- quotMultDenom  13 4 SIsNonZero
 
