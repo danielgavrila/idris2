@@ -138,20 +138,24 @@ eitherZero  (S a) b   p2 = ?prf1    --zeroPlusLeftZero' b  (a*b)
 zeroSmallest: LTE 1 0  -> Void
 zeroSmallest  LTEZero impossible
 
-disjoint : (n : Nat) -> Z = S n -> Void
-disjoint n prf = replace {p = disjointTy} prf ()
-  where
-    disjointTy : Nat -> Type
-    disjointTy Z = ()
-    disjointTy (S k) = Void
+gtZero : gt 1 0 = True
+gtZero = Refl  
 
-zeroSmallest': (a:Nat) -> LTE 1  (mult a 0) -> Void
-zeroSmallest' a prf = let tgt : LTE 1 0 -> Void
-                          tgt= zeroSmallest 
-                      in ?abc  
-                      --rewrite Refl in
-                      --rewrite multZeroRightZero a in 
-                      --tgt
+
+gteMultZero :(a:Nat) ->  gte 0 (mult a 0) = True 
+gteMultZero Z = Refl
+gteMultZero (S k) = gteMultZero k 
+
+
+ltMultZero :(a:Nat) ->  lt   (mult a 0) 1 = True 
+ltMultZero Z = Refl
+ltMultZero (S k) = ltMultZero k 
+
+ltMultZeroF :(a:Nat) ->  lt  1 (mult a 0)  = False 
+ltMultZeroF Z = Refl
+ltMultZeroF (S k) = ltMultZeroF k 
+
+
 
 p1: Nat -> Type
 p1 x = (x=2)
@@ -164,25 +168,39 @@ p3: (a:Nat) ->Type
 p3 Z = Void
 p3 (S k) = ()
 
-Uninhabited (LTE 1 0 ) where  -- (mult a 0)
-  uninhabited LTEZero impossible
-  --uninhabited (LTESucc ?lte1) = ?lte2
+data  MultZero1:  (a:Nat ) ->True =  lt  0 (mult a 0) -> Type where
+      MkMultZero: MultZero1 a prf 
 
---Uninhabited (LTE (S n) Z) where
---  uninhabited LTEZero impossible
+--Uninhabited ( (a:Nat ) ->True =  lt  0 (mult a 0) ) where  -- (mult a 0)
+--  uninhabited MkMultZero  impossible 
 
-multWithZero: (a:Nat) ->  0 `LT` (mult a 0 ) ->Void   
-multWithZero a ?prf4   = ?abs1 
 
-bothNonZero :(a,b : Nat) -> LT 0 (a*b)  ->  False = isZero a ||  isZero b          -- ((False = isZero a ) && (False =  isZero b)) = True           
+bothNonZero :(a,b : Nat) -> True = lt 0 (a*b)  ->  True= isSucc a &&  isSucc b          -- ((False = isZero a ) && (False =  isZero b)) = True           
 bothNonZero  0     b     p1 impossible  
 bothNonZero  (S a) (S b) p2 = Refl --?prf3    --zeroPlusLeftZero' b  (a*b)
-bothNonZero   a      0     p1  =   ?prf2 --impossible    let (multZeroRightZero a )
+bothNonZero   a      0     p1  = ?prf2  -- absurd p1 -- ?prf2 --impossible    let (multZeroRightZero a )
+plus_commutes1 : (n : Nat) -> (m : Nat) -> n + m = m + n
+
+
+invertContraBool : (a : Bool) -> (b : Bool) -> (a = b -> Void) -> (not a = b)
+invertContraBool False False contra = absurd ( contra ?iRefl1 )
+invertContraBool False True contra = ?iRefl2
+invertContraBool True False contra = Refl
+invertContraBool True True contra = ?ctr1    --absurd $ contra Refl
+
 
 -- quotMultDenom  13 4 SIsNonZero
 
 -- LTEIsTransitive : (m : Nat) -> (n : Nat) -> (o : Nat) -> LTE m n -> LTE n o -> LTE m o
 {-
+
+disjoint : (n : Nat) -> Z = S n -> Void
+disjoint n prf = replace {p = disjointTy} prf ()
+  where
+    disjointTy : Nat -> Type
+    disjointTy Z = ()
+    disjointTy (S k) = Void
+
 
 tst1 : LTE 2 4
 tst1 = LTESucc (LTESucc LTEZero)
