@@ -132,18 +132,58 @@ zeroPlusLeftZero' (S k) b _ impossible
 eitherZero :(a,b : Nat) -> a*b = 0 -> True = isZero a ||  isZero b           
 eitherZero  0     b   p1 = Refl 
 eitherZero  (S a) b   p2 = ?prf1    --zeroPlusLeftZero' b  (a*b)
-                 
---    multZeroLeftZero : (right : Nat) -> Z * right = Z                 
---    multZeroRightZero : (left : Nat) -> left * Z = Z
-multWithZero: (a:Nat) ->  LTE 1 (mult a 0) -> Void    -- (mult a 0 )
-multWithZero a _  impossible  
+
+--  multZeroRightZero : (left : Nat) -> left * Z = Z
+--  multZeroLeftZero  : (right : Nat) -> Z * right = Z
+zeroSmallest: LTE 1 0  -> Void
+zeroSmallest  LTEZero impossible
+
+disjoint : (n : Nat) -> Z = S n -> Void
+disjoint n prf = replace {p = disjointTy} prf ()
+  where
+    disjointTy : Nat -> Type
+    disjointTy Z = ()
+    disjointTy (S k) = Void
+
+zeroSmallest': (a:Nat) -> LTE 1  (mult a 0) -> Void
+zeroSmallest' a prf = let tgt : LTE 1 0 -> Void
+                          tgt= zeroSmallest 
+                      in ?abc  
+                      --rewrite Refl in
+                      --rewrite multZeroRightZero a in 
+                      --tgt
+
+p1: Nat -> Type
+p1 x = (x=2)
+
+testRewrite2: (x=y) -> (p1 y) -> (p1 x)
+testRewrite2 a b = rewrite a in b
+
+
+p3: (a:Nat) ->Type
+p3 Z = Void
+p3 (S k) = ()
+
+Uninhabited (LTE 1 0 ) where  -- (mult a 0)
+  uninhabited LTEZero impossible
+  --uninhabited (LTESucc ?lte1) = ?lte2
+
+--Uninhabited (LTE (S n) Z) where
+--  uninhabited LTEZero impossible
+
+multWithZero: (a:Nat) ->  0 `LT` (mult a 0 ) ->Void   
+multWithZero a ?prf4   = ?abs1 
 
 bothNonZero :(a,b : Nat) -> LT 0 (a*b)  ->  False = isZero a ||  isZero b          -- ((False = isZero a ) && (False =  isZero b)) = True           
 bothNonZero  0     b     p1 impossible  
 bothNonZero  (S a) (S b) p2 = Refl --?prf3    --zeroPlusLeftZero' b  (a*b)
-bothNonZero   a      0     p1  =  ?prf2 --impossible  (multZeroRightZero a ) --
+bothNonZero   a      0     p1  =   ?prf2 --impossible    let (multZeroRightZero a )
 
 -- quotMultDenom  13 4 SIsNonZero
 
 -- LTEIsTransitive : (m : Nat) -> (n : Nat) -> (o : Nat) -> LTE m n -> LTE n o -> LTE m o
+{-
 
+tst1 : LTE 2 4
+tst1 = LTESucc (LTESucc LTEZero)
+-}
